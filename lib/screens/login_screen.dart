@@ -100,21 +100,49 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(height: 3.5.h,),
+              // InkWell(
+              //   onTap: (){
+              //     if(loginController.loginKey.currentState!.validate())
+              //     {
+              //       loginController.SignIn();
+              //       Navigator.push(context,MaterialPageRoute(builder: (context)=>MenuScreen()));
+              //     }
+              //   },
+              //   child: Container(
+              //     height: 6.2.h,
+              //     width: 100.w,
+              //     decoration: BoxDecoration(
+              //         color: ColorsForApp.loginButtonColor,
+              //         borderRadius: BorderRadius.circular(15)
+              //     ),
+              //     child: Center(child: Text("Login",style: TextStyle(fontSize: 18.sp,fontWeight: FontWeight.w500,color: Colors.white),)),
+              //   ),
+              // ),
               InkWell(
-                onTap: (){
-                  if(loginController.loginKey.currentState!.validate())
-                  {
-                    Navigator.push(context,MaterialPageRoute(builder: (context)=>MenuScreen()));
+                onTap: () async {
+                  if (loginController.loginKey.currentState!.validate()) {
+                    bool success = await loginController.signIn(context);
+                    if (success) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MenuScreen()),
+                      );
+                    }
                   }
                 },
                 child: Container(
                   height: 6.2.h,
                   width: 100.w,
                   decoration: BoxDecoration(
-                      color: ColorsForApp.loginButtonColor,
-                      borderRadius: BorderRadius.circular(15)
+                    color: ColorsForApp.loginButtonColor,
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  child: Center(child: Text("Login",style: TextStyle(fontSize: 18.sp,fontWeight: FontWeight.w500,color: Colors.white),)),
+                  child: Center(
+                    child: Text(
+                      "Login",
+                      style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500, color: Colors.white),
+                    ),
+                  ),
                 ),
               ),
               SizedBox(height: 3.h,),

@@ -12,40 +12,65 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
+  // late AnimationController _animationController;
+  // late Animation<double> _fadeAnimation;
+  //
+  // @override
+  // void initState() {
+  //   super.initState();
+  //
+  //   _animationController = AnimationController(
+  //     vsync: this,
+  //     duration: Duration(milliseconds: 800), // Adjust duration as needed
+  //   );
+  //
+  //
+  //   _fadeAnimation = Tween<double>(begin: 0.0, end: 0.0).animate(
+  //     CurvedAnimation(
+  //       parent: _animationController,
+  //       curve: Curves.easeInOut,
+  //     ),
+  //   );
+  //
+  //   _animationController.forward();
+  //   Future.delayed(Duration(milliseconds: 2100), () {
+  //     Navigator.of(context).pushReplacement(
+  //       MaterialPageRoute(
+  //         builder: (context) => LoginScreen(), // Navigate to your main screen
+  //       ),
+  //     );
+  //   });
+  // }
+
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-
-    _animationController = AnimationController(
+    _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 800), // Adjust duration as needed
+      duration: Duration(milliseconds: 1000),
     );
-
-
-    _fadeAnimation = Tween<double>(begin: 0.1, end: 1.0).animate(
+    _animation = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(
-        parent: _animationController,
+        parent: _controller,
         curve: Curves.easeInOut,
       ),
     );
 
-    _animationController.forward();
-    Future.delayed(Duration(milliseconds: 1900), () {
+    _controller.forward();
+
+    Future.delayed(Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => LoginScreen(), // Navigate to your main screen
-        ),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
       );
     });
   }
 
   @override
   void dispose() {
-    // Dispose animation controller
-    _animationController.dispose();
+    _controller.dispose(); // Dispose animation controller
     super.dispose();
   }
 
@@ -58,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             FadeInDown(
-              duration:Duration(milliseconds: 1000) ,
+              duration:Duration(milliseconds: 2000) ,
               child: Container(
                 height: 35.h,
                 width: 100.w,
@@ -71,9 +96,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 ),
               ),
             ),
-            SizedBox(height: 1.h,),
             FadeInUp(
-              duration: Duration(milliseconds: 1900),
+              duration: Duration(milliseconds: 2000),
               child: Container(
                   child: Center(child: Text("Welocome to Our Hotel",style: TextStyle(fontSize: 20.sp,fontWeight: FontWeight.w700,color: Colors.brown.shade800),))),
             )
