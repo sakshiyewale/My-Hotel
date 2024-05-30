@@ -10,7 +10,7 @@ import 'package:my_hotel/screens/spashScreen.dart';
 
 class AppPages
 {
- static String INITIAL_ROUTE = Routs.SPLASH_ROUTE;
+ static String INITIAL_ROUTE = Routs.ORDER_ROUTE;
 
  static final pages =
  [

@@ -40,12 +40,13 @@ final GlobalKey<FormState> loginKey = GlobalKey<FormState>();
 //   }
 // }
   Future<bool> signIn(BuildContext context) async {
+    print('###helo');
     try {
       Map<String, dynamic> userData = {
         'username': usernameController.text.trim(),
         'password': passController.text.trim(),
       };
-
+      print('###helo1');
       final http.Response response = await http.post(
         Uri.parse("http://localhost:5000/api/auth/login"),
         body: jsonEncode(userData),
@@ -53,10 +54,11 @@ final GlobalKey<FormState> loginKey = GlobalKey<FormState>();
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
-
+      print('###helo2');
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         print('Data Added: $data');
+        print('###helo3');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: ColorsForApp.loginButtonColor,

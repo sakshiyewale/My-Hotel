@@ -12,18 +12,11 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 class _MenuScreenState extends State<MenuScreen> {
-  late MenuController menuController;
   int selectedIndexone = 0;
-  int selectedIndex = 0;
+  int selectedIndex = -1;
   int selectedtwoIndex = 0;
   bool abc = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // Initialize LoginController here
-    menuController = Get.put(MenuController());
-  }
 
   List<String> items = [
   'Pub',
@@ -64,7 +57,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   shrinkWrap: true,
                   itemCount: items.length, // Use the length of items list
                   itemBuilder: (context, index) {
-                    bool isSelected = false;
+                    bool isSelected = selectedIndex==0;
                     return Row(
                       children: [
                         Padding(
@@ -73,7 +66,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             height: 6.5.h,
                             width: 36.w,
                             decoration: BoxDecoration(
-                              color: selectedIndex == index
+                              color: isSelected
                                   ? Colors.white
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(15),
@@ -88,11 +81,11 @@ class _MenuScreenState extends State<MenuScreen> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                           BorderRadius.circular(50),
-                                          color: selectedIndex == index
+                                          color: isSelected
                                               ? Colors.orange
                                               : Colors.white,
                                           border: Border.all(
-                                              color: selectedIndex == index
+                                              color: isSelected
                                                   ? Colors.orange
                                                   : Colors.grey,
                                               width: 2)),
@@ -102,13 +95,13 @@ class _MenuScreenState extends State<MenuScreen> {
                                   ),
                                   onTap: () {
                                     setState(() {
-                                      selectedIndex = index;
+                                      selectedIndex = 0;
                                     });
                                   },
                                 ),
                                 Padding(
                                   padding: EdgeInsets.only(left: 7.sp),
-                                  child: Text(items[index]), // Display item from the list
+                                  child: Text(items[0]), // Display item from the list
                                 )
                               ],
                             ),
@@ -649,3 +642,5 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 }
+
+

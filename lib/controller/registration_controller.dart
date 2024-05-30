@@ -13,12 +13,13 @@ class RegistrationController extends GetxController {
 
   Future<bool> signUp(BuildContext context) async {
     try {
+      print('###helo');
       Map<String, dynamic> userData = {
         'username': usernameController.text.trim(),
         'email': emailController.text.trim(),
         'password': passController.text.trim(),
       };
-
+      print('###helo1');
       final http.Response response = await http.post(
         Uri.parse("http://localhost:5000/api/auth/setup"),
         body: jsonEncode(userData),
@@ -26,10 +27,11 @@ class RegistrationController extends GetxController {
           'Content-Type': 'application/json; charset=UTF-8',
         },
       );
-
+      print('###helo2');
       if (response.statusCode == 400) {
         var data = jsonDecode(response.body);
         print('Data Added: $data');
+        print('###Resistration Successfyll');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: ColorsForApp.loginButtonColor,
