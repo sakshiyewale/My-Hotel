@@ -128,7 +128,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     if (success) {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MenuScreen()),
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
                       );
                     }
                   }

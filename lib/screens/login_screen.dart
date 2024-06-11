@@ -4,9 +4,11 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:my_hotel/controller/login_controller.dart'; // Assuming LoginController is defined in this file
+import 'package:my_hotel/screens/order_screen.dart';
 import 'package:my_hotel/screens/registration_screen.dart';
 import 'package:my_hotel/utils/app_colors.dart';
 import 'package:sizer/sizer.dart';
+import '../controller/connectivity_controller.dart';
 import '../widgets/text_field.dart';
 import 'menu_screen.dart';
 
@@ -18,6 +20,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  ConnectivityController connectivityController =
+  Get.put(ConnectivityController(), permanent: true);
   late LoginController loginController; // Define loginController as a late variable
 
   @override
@@ -125,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (success) {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MenuScreen()),
+                        MaterialPageRoute(builder: (context) => OrderScreen()),
                       );
                     }
                   }

@@ -34,7 +34,7 @@ class RegistrationController extends GetxController {
         print('###Resistration Successfyll');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: ColorsForApp.loginButtonColor,
+            backgroundColor: Colors.orange,
             content: Text('Registration Successful'),
           ),
         );

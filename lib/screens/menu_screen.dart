@@ -1,646 +1,355 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:my_hotel/screens/order_screen.dart';
+import 'package:my_hotel/controller/menu_controller.dart';
+import 'package:my_hotel/widgets/text_field.dart';
 import 'package:sizer/sizer.dart';
-class MenuScreen extends StatefulWidget {
-  const MenuScreen({super.key});
+import '../utils/app_colors.dart';
+import 'kot_screen.dart';
+
+class AppMenuScreen extends StatefulWidget {
+  const AppMenuScreen({Key? key}) : super(key: key);
+
   @override
-  State<MenuScreen> createState() => _MenuScreenState();
+  State<AppMenuScreen> createState() => _AppMenuScreenState();
 }
-class _MenuScreenState extends State<MenuScreen> {
-  int selectedIndexone = 0;
-  int selectedIndex = -1;
-  int selectedtwoIndex = 0;
-  bool abc = false;
 
+class _AppMenuScreenState extends State<AppMenuScreen> {
+  AppMenuController appMenuController = Get.put(AppMenuController());
+  int selectedIndex = 0;
+  String selectedSection = '';
+  List<dynamic> menuItems = [];
+  List<dynamic> filteredMenuItems = [];
+  Map<dynamic, int> itemQuantities = {};
+  TextEditingController searchController = TextEditingController();
+  int? selectedMenuItemIndex;
 
-  List<String> items = [
-  'Pub',
-  'Terrace',
-    'Garden',
-    'VIP Room'
-  ];
-  List<String> items1 =
-  [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '10'
-  ];
-  String selectedCategory = 'Chicken';
+  @override
+  void initState() {
+    super.initState();
+    appMenuController.fetchCategories().then((_) {
+      if (appMenuController.categories.isNotEmpty) {
+        fetchMenuItems(appMenuController.categories[0]['name']);
+      }
+    });
+    searchController.addListener(_filterMenuItems);
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void fetchMenuItems(String category) async {
+    setState(() {
+      menuItems = [];
+    });
+    List<dynamic> items = await appMenuController.fetchMenuByCategory(category);
+    setState(() {
+      menuItems = items;
+      filteredMenuItems = items;
+    });
+  }
+
+  void _filterMenuItems() {
+    String query = searchController.text.toLowerCase();
+    setState(() {
+      filteredMenuItems = menuItems.where((item) {
+        String name = item['name'].toLowerCase();
+        String id = item['id'].toString();
+        return name.contains(query) || id.contains(query);
+      }).toList();
+    });
+  }
+
+  void increaseQuantity(dynamic menuItem) {
+    setState(() {
+      itemQuantities.update(menuItem, (value) => value + 1, ifAbsent: () => 1);
+    });
+  }
+
+  void decreaseQuantity(dynamic menuItem) {
+    setState(() {
+      if (itemQuantities.containsKey(menuItem)) {
+        if (itemQuantities[menuItem]! > 1) {
+          itemQuantities.update(menuItem, (value) => value - 1);
+        } else {
+          itemQuantities.remove(menuItem);
+        }
+      }
+    });
+  }
+
+  void updateQuantity(dynamic menuItem, String quantityText) {
+    int? quantity = int.tryParse(quantityText);
+    if (quantity != null && quantity > 0) {
+      setState(() {
+        itemQuantities[menuItem] = quantity;
+      });
+    } else {
+      // Handle invalid input here, for now, let's just remove the item
+      setState(() {
+        itemQuantities.remove(menuItem);
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding:  EdgeInsets.symmetric(horizontal: 5.sp),
-        child: SafeArea(
-          child: Column(
-            children: [
-              SizedBox(height: 2.5.h,),
-              Container(
-                height: 10.h,
-                width: 100.w,
-                child: ListView.builder(
+      body: Obx(() {
+        if (appMenuController.categories.isEmpty) {
+          return Center(child: CircularProgressIndicator());
+        } else {
+          return SafeArea(
+            child: Column(
+              children: [
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: items.length, // Use the length of items list
-                  itemBuilder: (context, index) {
-                    bool isSelected = selectedIndex==0;
-                    return Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: List.generate(
+                      appMenuController.categories.length,
+                          (index) {
+                        return _buildCategoryButton(
+                          appMenuController.categories[index]['name'].toString(),
+                          index,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height: 3.h,),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Container(
+                    height: 5.5.h,
+                    child: TextFormField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        labelText: "Search Menu / id....",
+                        suffixIcon: Icon(Icons.search, color: Colors.black,),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 100.h,
+                    width: 100.w,
+                    child: GridView.builder(
+                      padding: EdgeInsets.all(10),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 1.sp,
+                      ),
+                      itemCount: filteredMenuItems.length,
+                      itemBuilder: (context, index) {
+                        TextEditingController quantityController = TextEditingController();
+
+                        quantityController.text = itemQuantities[filteredMenuItems[index]]?.toString() ?? '';
+
+                        quantityController.addListener(() {
+                          String newText = quantityController.text;
+                          if (newText.startsWith('0') && newText.length > 1) {
+                            newText = newText.substring(0);
+                            quantityController.value = TextEditingValue(
+                              text: newText,
+                              selection: TextSelection.collapsed(offset: newText.length),
+                            );
+                          }
+                          updateQuantity(filteredMenuItems[index], newText);
+                        });
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedMenuItemIndex = index;
+                            });
+                          },
                           child: Container(
-                            height: 6.5.h,
-                            width: 36.w,
+                            padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? Colors.white
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: Colors.grey, width: 2),
-                            ),
-                            child: Row(
-                              children: [
-                                GestureDetector(
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 10.sp),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                          BorderRadius.circular(50),
-                                          color: isSelected
-                                              ? Colors.orange
-                                              : Colors.white,
-                                          border: Border.all(
-                                              color: isSelected
-                                                  ? Colors.orange
-                                                  : Colors.grey,
-                                              width: 2)),
-                                      height: 2.3.h,
-                                      width: 4.6.w,
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    setState(() {
-                                      selectedIndex = 0;
-                                    });
-                                  },
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 7.sp),
-                                  child: Text(items[0]), // Display item from the list
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-              Container(
-                height: 10.h,
-                width: 100.w,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return Row(
-                      children: [
-                        Padding(
-                          padding:EdgeInsets.only(top: 6.sp,left: 8.sp),
-                          child: GestureDetector(
-                            child: Container(
-                              height: 10.h,
-                              width: 25.w,
-                              decoration:  BoxDecoration(
-                                  color: selectedtwoIndex == index
-                                      ? Colors.orangeAccent
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  // boxShadow: [
-                                  //   BoxShadow(
-                                  //     color: Colors.grey,
-                                  //     blurRadius: 1,
-                                  //     offset:Offset(1, 1),
-                                  //     spreadRadius: 1,
-                                  //   ),
-                                  // ],
-                                  border: Border.all(color:selectedtwoIndex==index
-                                      ? Colors.orangeAccent
-                                      : Colors.grey ,
-                                      width: 2)
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 1,
+                                style: BorderStyle.solid,
                               ),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding:  EdgeInsets.only(top: 4.sp,right: 35.sp),
-                                    // child: Text("1",style: TextStyle(fontWeight: FontWeight.w700),),
-                                    child: Text(items1[index],style: TextStyle(fontWeight: FontWeight.w700,color: selectedtwoIndex==index
-                                        ? Colors.white
-                                        : Colors.black,),),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 3.sp, left: 60.sp),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Icon(Icons.currency_rupee, color: Colors.green, size: 11.sp,),
+                                          Text(
+                                            'Price: ${filteredMenuItems[index]['price']}',
+                                            style: TextStyle(fontSize: 9.sp, color: Colors.green),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 5.h),
+                                Center(
+                                  child: Text(
+                                    filteredMenuItems[index]['name'],
+                                    style: TextStyle(fontSize: 9.sp, color: Colors.black),
                                   ),
-                                  Container(
-                                    height: 1.h,
-                                      width: 8.w,
-                                      child: Icon(Icons.dining_sharp,size: 28.sp,
-                                      color: selectedtwoIndex==index
-                                          ? Colors.white
-                                          : Colors.black,
+                                ),
+                                SizedBox(height: 1.h),
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.add),
+                                        onPressed: () {
+                                          increaseQuantity(filteredMenuItems[index]);
+                                        },
+                                      ),
+                                      Container(
+                                        height: 5.h,
+                                        child: CustomTextField(
+                                          width: 15.w,
+                                          hintText: "Quantity",
+                                          controller: quantityController,
                                         ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.remove),
+                                        onPressed: () {
+                                          decreaseQuantity(filteredMenuItems[index]);
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  //Text("\$706",style: TextStyle(fontWeight: FontWeight.w500),)
-                                ],
-                              ),
-                            ),
-                            onTap: (){
-                              setState(() {
-                                selectedtwoIndex = index;
-                              });
-
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-             SizedBox(height: 1.5.h,),
-
-              Expanded(
-                child: Padding(
-                  padding:  EdgeInsets.only(top:  10.sp),
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                _buildCategoryButton('Chicken'),
-                                _buildCategoryButton('Kabab'),
-                                _buildCategoryButton('Rice'),
-                                _buildCategoryButton('Soup'),
-                                _buildCategoryButton('Veg'),
+                                ),
                               ],
                             ),
-                            SizedBox(height: 1.5.h,),
-                            Container(
-                              height: 5.5.h,
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11)
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11)
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(11)
-                                    ),
-                                    labelText: "Search Menu / id....",
-                                    suffixIcon: Icon(Icons.search,color: Colors.black,)
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 0.5.sp,),
-                          ],
-                        ),
-
-                        // Display different body based on the selection
-                        selectedCategory == 'Chicken'
-                            ? _Chicken()
-                            : selectedCategory == 'Kabab'
-                            ? _Kabab()
-                            : selectedCategory == 'Rice'
-                            ? _Rice()
-                            : selectedCategory == 'Soup'
-                            ? _Soup()
-                            :selectedCategory =='Veg'
-                            ? _Veg()
-                            : Container(), // Return an empty container if category not found
-                      ],
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-              ),
-
-
-              // SizedBox(height: 3.w,),
-
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  Widget _Chicken() {
-    return Expanded(
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 2),
-        itemCount: 30,
-        itemBuilder: (context, index) {
-          return Row(
-            children: [
-              GestureDetector(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.sp, left: 8.sp),
-                  child: Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey, width: 2),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.sp, left: 10.sp),
-                                child: Text(
-                                  "100",
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.sp, left: 60.sp,right: 15),
-                                child: Text(
-                                  "\$100",
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 10.sp, top: 3.sp),
-                                child: Text(
-                                  "Veg Manchow Soup",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  Get.to(OrderScreen());
-                },
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-  Widget  _Kabab() {
-    return Expanded(
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 2),
-        itemCount: 30,
-        itemBuilder: (context, index) {
-          return Row(
-            children: [
-              GestureDetector(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.sp, left: 8.sp),
-                  child: Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey, width: 2),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.sp, left: 10.sp),
-                                child: Text(
-                                  "200",
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.sp, left: 60.sp,right: 15),
-                                child: Text(
-                                  "\$200",
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 10.sp, top: 3.sp),
-                                child: Text(
-                                  "Kabab",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  Get.to(OrderScreen());
-                },
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-  Widget  _Rice() {
-    return Expanded(
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 2),
-        itemCount: 30,
-        itemBuilder: (context, index) {
-          return Row(
-            children: [
-              GestureDetector(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.sp, left: 8.sp),
-                  child: Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey, width: 2),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.sp, left: 10.sp),
-                                child: Text(
-                                  "300",
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.sp, left: 60.sp,right: 15),
-                                child: Text(
-                                  "\$300",
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 10.sp, top: 3.sp),
-                                child: Text(
-                                  "Rice",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                onTap: () {
-                  Get.to(OrderScreen());
-                },
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-  Widget  _Soup() {
-    return Expanded(
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 2),
-        itemCount: 30,
-        itemBuilder: (context, index) {
-          return Row(
-            children: [
-              GestureDetector(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.sp, left: 8.sp),
+                SingleChildScrollView(
                   child: Container(
-                    height: 9.h,
-                    width: 45.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.grey, width: 2),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 10.sp, left: 10.sp),
-                              child: Text(
-                                "400",
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 10.sp, left: 60.sp),
-                              child: Text(
-                                "\$400",
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 10.sp, top: 3.sp),
-                              child: Text(
-                                "Soup",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                    height: 25.h,
+                    width: 100.w,
+                    child: ListView.builder(
+                      itemCount: itemQuantities.length,
+                      itemBuilder: (context, index) {
+                        var menuItem = itemQuantities.keys.elementAt(index);
+                        var quantity = itemQuantities[menuItem];
+                        return ListTile(
+                          title: Text(
+                            '${menuItem['name']} - Quantity: $quantity',
+                            style: TextStyle(fontSize: 10.sp, color: Colors.orange),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-                onTap: () {
-                  Get.to(OrderScreen());
-                },
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-  Widget  _Veg() {
-    return Expanded(
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,childAspectRatio: 2),
-        itemCount: 30,
-        itemBuilder: (context, index) {
-          return Row(
-            children: [
-              GestureDetector(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.sp, left: 8.sp),
-                  child: Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Colors.grey, width: 2),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.sp, left: 10.sp),
-                                child: Text(
-                                  "500",
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.sp, left: 60.sp,right: 15),
-                                child: Text(
-                                  "\$500",
-                                  style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 10.sp, top: 3.sp),
-                                child: Text(
-                                  "Veg",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) => KOTScreen(selectedItems: itemQuantities,)));
+                        Get.to(KOTScreen(selectedItems: itemQuantities));
+                      },
+                      child: Container(
+                        height: 6.h,
+                        width: 30.w,
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text("KOT", style: TextStyle(
+                            color: Colors.white,
+                          ),),
+                        ),
                       ),
                     ),
-                  ),
+                    SizedBox(width: 10,),
+                    GestureDetector(
+                      onTap: (){},
+                      child: Container(
+                        height: 6.h,
+                        width: 30.w,
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text("Re-KOT", style: TextStyle(
+                            color: Colors.white,
+                          ),),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                onTap: () {
-                  Get.to(OrderScreen());
-                },
-              ),
-            ],
+                SizedBox(height: 10,),
+              ],
+            ),
           );
-        },
-      ),
+        }
+      }),
     );
   }
-  Widget _buildCategoryButton(String category) {
-    Color containerColor = selectedCategory == category
-        ? Colors.orangeAccent
-        : Colors.white;
+
+  Widget _buildCategoryButton(String category, int index) {
+    bool isSelected = selectedIndex == index;
+    Color containerColor = isSelected ? Colors.orangeAccent : Colors.white;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedCategory = category;
+          selectedIndex = index;
+          selectedSection = category;
         });
+        fetchMenuItems(category);
       },
       child: Container(
         padding: EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(horizontal: 4.0),
         decoration: BoxDecoration(
-          border: Border.all(color: selectedCategory==category
-              ? Colors.orangeAccent
-              : Colors.black,
-          ),
+          border: Border.all(color: isSelected ? Colors.orangeAccent : Colors.black),
           borderRadius: BorderRadius.circular(5),
           color: containerColor,
         ),
         child: Text(
           category,
           style: TextStyle(
-            fontSize: 10.sp,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: selectedCategory == category
-                ? Colors.white
-                : Colors.black,
+            color: isSelected ? Colors.white : Colors.black,
           ),
         ),
       ),
     );
   }
 }
-
-

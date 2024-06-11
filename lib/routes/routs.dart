@@ -6,4 +6,6 @@ class Routs
  static String HISTORY_ROUTE = "/history_route";
  static String SPLASH_ROUTE = "/splash_route";
  static String REGISTRATION_ROUTE = "/registration_route";
+ static String  KOT_ROUTE = "/kot_route";
+ static String CONNECTIVITY_ROUTE = "/connectivity_route";
 }
