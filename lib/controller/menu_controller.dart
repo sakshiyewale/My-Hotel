@@ -11,7 +11,7 @@ class AppMenuController extends GetxController {
 
   // Fetch main categories with their menus
   Future<void> fetchCategories() async {
-    final response = await http.get(Uri.parse("http://localhost:5000/api/menu/maincategories/menus"));
+    final response = await http.get(Uri.parse("http://103.159.85.246:5000/api/main/"));
     if (response.statusCode == 200) {
       var jsonData = jsonDecode(response.body.toString());
       categories.value = jsonData;
@@ -22,7 +22,7 @@ class AppMenuController extends GetxController {
 
   // Fetch sub-menu items by category
   Future<List<dynamic>> fetchMenuByCategory(String category) async {
-    final response = await http.get(Uri.parse("http://localhost:5000/api/menu/maincategories/menus"));
+    final response = await http.get(Uri.parse("http://103.159.85.246:5000/api/main/"));
     if (response.statusCode == 200) {
       var jsonData = jsonDecode(response.body.toString());
       var categoryData = jsonData.firstWhere((item) => item['name'] == category, orElse: () => null);

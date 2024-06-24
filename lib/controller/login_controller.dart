@@ -48,7 +48,7 @@ final GlobalKey<FormState> loginKey = GlobalKey<FormState>();
       };
       print('###helo1');
       final http.Response response = await http.post(
-        Uri.parse("http://localhost:5000/api/auth/login"),
+        Uri.parse("http://103.159.85.246:5000/api/auth/login"),
         body: jsonEncode(userData),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -61,7 +61,7 @@ final GlobalKey<FormState> loginKey = GlobalKey<FormState>();
         print('###helo3');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: Colors.orange,
+            backgroundColor: Colors.green,
             content: Text('Login Successfully'),
           ),
         );

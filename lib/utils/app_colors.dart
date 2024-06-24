@@ -18,6 +18,7 @@ class ColorsForApp {
   static Color grayScale500 = ColorConverter.hexToColor("#9E9E9E");
   static Color hintColor = ColorConverter.hexToColor("#9D9D9D");
   static Color secondaryColor = ColorConverter.hexToColor("#6C82BA");
+  static Color tabColor = ColorConverter.hexToColor("fc6f03");
 
 
 }

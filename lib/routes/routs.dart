@@ -8,4 +8,6 @@ class Routs
  static String REGISTRATION_ROUTE = "/registration_route";
  static String  KOT_ROUTE = "/kot_route";
  static String CONNECTIVITY_ROUTE = "/connectivity_route";
+ static String SPLITTABLE_ROUTE ="/splittable_route";
+
 }

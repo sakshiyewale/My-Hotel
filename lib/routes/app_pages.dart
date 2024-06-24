@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:my_hotel/binding/app_binding.dart';
 import 'package:my_hotel/routes/routs.dart';
 import 'package:my_hotel/screens/connectivity%20check.dart';
-
 import 'package:my_hotel/screens/history_screen.dart';
 import 'package:my_hotel/screens/kot_screen.dart';
 import 'package:my_hotel/screens/login_screen.dart';
@@ -10,10 +9,11 @@ import 'package:my_hotel/screens/menu_screen.dart';
 import 'package:my_hotel/screens/order_screen.dart';
 import 'package:my_hotel/screens/registration_screen.dart';
 import 'package:my_hotel/screens/spashScreen.dart';
+import '../screens/split_table_screen.dart';
 
 class AppPages
 {
- static String INITIAL_ROUTE = Routs.ORDER_ROUTE;
+ static String INITIAL_ROUTE = Routs.MENU_ROUTE;
 
  static final pages =
  [
@@ -57,6 +57,14 @@ class AppPages
        name: Routs.CONNECTIVITY_ROUTE,
        page:()=> ConnectivityCheckScreen(),
        binding: ConnectivityBinding()
+   ),
+   GetPage(
+       name: Routs.SPLITTABLE_ROUTE,
+       page: ()=>SplitTableScreen(
+           tableName: "",
+           selectedSection: '',
+           selectedTableName: '',),
+       binding: SplashBinding()
    )
 
  ];

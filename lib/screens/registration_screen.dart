@@ -34,23 +34,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       backgroundColor: Colors.grey.shade100,
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15.sp, vertical: 15.sp),
+          padding: EdgeInsets.symmetric(horizontal: 15.sp,),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SafeArea(
-                child: Container(
-                  height: 30.h,
-                  width: 100.w,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/logo1-Photoroom.png-Photoroom.png"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 1.h),
+              // Container(
+              //   height: 30.h,
+              //   width: 100.w,
+              //   decoration: BoxDecoration(
+              //     image: DecorationImage(
+              //       image: AssetImage("assets/images/logo1-Photoroom.png-Photoroom.png"),
+              //       fit: BoxFit.cover,
+              //     ),
+              //   ),
+              // ),
+              Image.asset("assets/images/logo1-Photoroom.png-Photoroom.png",
+                height: 25.h,width: 80.w,),
               Text(
                 "Sign Up",
                 style: TextStyle(
@@ -112,9 +111,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       onTap: () {
                         // Add your Forgot Password functionality here
                       },
-                      child: Text(
-                        "Forgot Password ?",
-                        style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w400),
+                      child: Padding(
+                        padding:  EdgeInsets.only(left: 175.sp),
+                        child: Text("Forgot Password ?",style: TextStyle(fontSize: 11.sp,fontWeight: FontWeight.w400),),
                       ),
                     ),
                   ],
@@ -134,7 +133,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   }
                 },
                 child: Container(
-                  height: 6.2.h,
+                  height: 5.5.h,
                   width: 100.w,
                   decoration: BoxDecoration(
                     color: ColorsForApp.loginButtonColor,
@@ -148,18 +147,21 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 3.5.h),
+              SizedBox(height: 1.5.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     "Already Have An Account?",
-                    style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400),
+                    style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w400),
                   ),
-                  SizedBox(width: 2.5.w),
+                  SizedBox(width: 1.5.w),
                   InkWell(
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+                      registrationController.usernameController.clear();
+                      registrationController.passController.clear();
+                      registrationController.emailController.clear();
                     },
                     child: Text(
                       "Sign In",
@@ -172,7 +174,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 3.h),
+              SizedBox(height: 1.h,),
+              Container(
+                child: Image.asset("assets/images/ab_new_logo-removebg-preview.png",height: 15.h,width: 30.w,),
+              ),
+              SizedBox(height: 3.h,),
               Text(
                 "Branches: Pune | Satara | Kolhapur | Mumbai",
                 style: TextStyle(fontSize: 11.sp),

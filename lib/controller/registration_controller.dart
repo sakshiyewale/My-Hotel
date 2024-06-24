@@ -21,7 +21,7 @@ class RegistrationController extends GetxController {
       };
       print('###helo1');
       final http.Response response = await http.post(
-        Uri.parse("http://localhost:5000/api/auth/setup"),
+        Uri.parse("http://103.159.85.246:5000/api/auth/setup"),
         body: jsonEncode(userData),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -34,7 +34,7 @@ class RegistrationController extends GetxController {
         print('###Resistration Successfyll');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: Colors.orange,
+            backgroundColor: Colors.green,
             content: Text('Registration Successful'),
           ),
         );

@@ -18,15 +18,17 @@ class Model2 {
     required this.id,
     required this.name,
     required this.menus,
-    required this.v,
+    required this.v, required List tableNames,
   });
 
   factory Model2.fromJson(Map<String, dynamic> json) => Model2(
     id: json["_id"],
     name: json["name"],
     menus: List<Menu>.from(json["menus"].map((x) => Menu.fromJson(x))),
-    v: json["__v"],
+    v: json["__v"], tableNames: [],
   );
+
+  get tableNames => null;
 
   Map<String, dynamic> toJson() => {
     "_id": id,

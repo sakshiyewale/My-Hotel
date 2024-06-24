@@ -38,26 +38,15 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.grey.shade100,
       body: SingleChildScrollView(
         child: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 15.sp,vertical:30.sp),
+          padding:  EdgeInsets.symmetric(horizontal: 15.sp),
           child: Column(
             children: [
-              SafeArea(
-                child: Container(
-                  height: 30.h,
-                  width: 100.w,
-                  decoration: BoxDecoration(
-                    //color: Colors.grey,
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/logo1-Photoroom.png-Photoroom.png"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 1.h,
-              ),
-              Text("Login",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 26.sp,color: Colors.brown.shade800),),
+              Image.asset("assets/images/logo1-Photoroom.png-Photoroom.png",
+                height: 30.h,width: 80.w,),
+              // SizedBox(
+              //   height: 5.sp,
+              // ),
+              Text("Login",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 27.sp,color: Colors.brown.shade800),),
               SizedBox(
                 height: 3.h,
               ),
@@ -95,15 +84,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 1.5.h,),
+                    SizedBox(height: 1.h,),
                     Padding(
-                      padding:  EdgeInsets.only(left: 140.sp),
-                      child: Text("Forgot Password ?",style: TextStyle(fontSize: 13.sp,fontWeight: FontWeight.w400),),
+                      padding:  EdgeInsets.only(left: 175.sp),
+                      child: Text("Forgot Password ?",style: TextStyle(fontSize: 11.sp,fontWeight: FontWeight.w400),),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 3.5.h,),
+              SizedBox(height: 3.h,),
               // InkWell(
               //   onTap: (){
               //     if(loginController.loginKey.currentState!.validate())
@@ -131,11 +120,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         context,
                         MaterialPageRoute(builder: (context) => OrderScreen()),
                       );
+                      loginController.usernameController.clear();
+                      loginController.passController.clear();
                     }
                   }
                 },
                 child: Container(
-                  height: 6.2.h,
+                  height: 5.5.h,
                   width: 100.w,
                   decoration: BoxDecoration(
                     color: ColorsForApp.loginButtonColor,
@@ -149,12 +140,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 3.h,),
+              SizedBox(height: 2.h,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                Text("Don't Have An Account?",style: TextStyle(fontSize: 13.sp,fontWeight: FontWeight.w400),),
-                  SizedBox(width: 2.5.w,),
+                Text("Don't Have An Account?",style: TextStyle(fontSize: 11.sp,fontWeight: FontWeight.w400),),
+                  SizedBox(width: 1.5.w,),
                   InkWell(
                     onTap: (){
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>RegistrationScreen()));
@@ -162,7 +153,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text("Sign Up",style: TextStyle(fontSize: 13.sp,fontWeight: FontWeight.w700,color: ColorsForApp.loginButtonColor),))
                 ],
               ),
-              SizedBox(height: 6.h,),
+              SizedBox(height: 2.h,),
+              Container(
+                child: Image.asset("assets/images/ab_new_logo-removebg-preview.png",height: 15.h,width: 30.w,),
+              ),
+              SizedBox(height: 3.h,),
               Text("Branches: Pune | Satara | Kolhapur | Mumbai",style: TextStyle(fontSize: 11.sp),),
               // SizedBox(height: 0.3.h,),
               Padding(
